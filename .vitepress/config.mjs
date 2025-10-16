@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 import { generateSidebar } from "vitepress-sidebar";
 
 export default defineConfig({
+  base: '/learn/', 
   title: "learn-blog",
   themeConfig: {
     nav: [
