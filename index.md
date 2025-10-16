@@ -10,5 +10,5 @@ hero:
       link: /html/index
     - theme: alt
       text: JavaScript
-      link: /javascript/debounce
+      link: /javascript/专题系列/debounce
 
