@@ -7,8 +7,8 @@ hero:
   actions:
     - theme: brand
       text: HTML
-      link: /src/html/index
+      link: /html/index
     - theme: alt
       text: JavaScript
-      link: /src/javascript/debounce
+      link: /javascript/debounce
 
