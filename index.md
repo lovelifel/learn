@@ -1,25 +1,14 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
   name: "learn-blog"
-  text: "A VitePress Site"
-  tagline: My great project tagline
+  text: "一个系统学习前端的博客"
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: HTML
+      link: /src/html/index
     - theme: alt
-      text: API Examples
-      link: /api-examples
-
-features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
----
+      text: JavaScript
+      link: /src/javascript/debounce
 
