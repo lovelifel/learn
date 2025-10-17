@@ -11,4 +11,10 @@ hero:
     - theme: alt
       text: JavaScript
       link: /javascript/专题系列/debounce
-
+ 
+features:
+  - icon: 🎯
+    title: 思维导图
+    details: 展示前端需要学习的技术方案
+    link: https://github.com/lovelifel/learn/blob/master/%E5%89%8D%E7%AB%AF.xmind
+---
