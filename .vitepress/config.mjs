@@ -9,6 +9,7 @@ export default defineConfig({
       { text: "首页", link: "/" },
       { text: "JavaScript", link: "/javascript/专题系列/debounce.md" },
       { text: "HTML", link: "/html/index.md" },
+      { text: "CSS", link: "/css/flex" },
     ],
     sidebar: generateSidebar([
       {
@@ -23,6 +24,14 @@ export default defineConfig({
         documentRootPath: "./",
         scanStartPath: "html",
         resolvePath: "/html/",
+        useTitleFromFrontmatter: true,
+        folderNameAsTitle: true,
+        collapseDepth: 2, // 嵌套层级
+      },
+      {
+        documentRootPath: "./",
+        scanStartPath: "css",
+        resolvePath: "/css/",
         useTitleFromFrontmatter: true,
         folderNameAsTitle: true,
         collapseDepth: 2, // 嵌套层级

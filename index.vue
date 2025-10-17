@@ -26,3 +26,13 @@ const unique = (array) => {
 
 unique(a1);
 </script>
+
+
+<style scoped> 
+
+div{
+
+border-radius: ;
+
+}
+</style>
