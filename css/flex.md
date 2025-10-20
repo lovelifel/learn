@@ -285,13 +285,16 @@ align-self
 建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
 
 ## align-self
+
 <span class="i">align-self</span>属性允许单个项目有与其他项目不一样的对齐方式，可覆盖<span class="i">align-items</span>属性。默认值为<span class="i">auto</span>，表示继承父元素的<span class="i">align-items</span>属性，如果没有父元素，则等同于<span class="i">stretch</span>。
+
 ```css
 .item {
   align-self: auto | flex-start | flex-end | center | baseline | stretch;
 }
 ```
 <img src="https://www.ruanyifeng.com/blogimg/asset/2015/bg2015071016.png" alt="" title="">
+
 该属性可能取6个值，除了auto，其他都与align-items属性完全一致。
 
 <style scoped>
