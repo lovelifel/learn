@@ -47,6 +47,7 @@ class MyPromise {
               );
             } catch (e) {
               if (called) return;
+              called = true;
               return this.reject(e);
             }
           }
