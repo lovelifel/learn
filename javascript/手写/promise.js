@@ -1,90 +1,69 @@
 class MyPromise {
   constructor(executor) {
     this.state = "pending";
-    this.value = undefined;
-    this.reason = undefined;
+    this.value = null;
+    this.reason = null;
     this.onFulfilledCallbacks = [];
     this.onRejectedCallbacks = [];
     this.resolve = (value) => {
       if (this.state === "pending") {
         this.state = "fulfilled";
         this.value = value;
-        this.onFulfilledCallbacks.forEach((element) => {
-          element(this.value);
-        });
+        this.onFulfilledCallbacks.forEach((fn) => fn());
       }
     };
-
     this.reject = (reason) => {
       if (this.state === "pending") {
-        this.state = "rejected";
+        this.state = "reject";
         this.reason = reason;
-        this.onRejectedCallbacks.forEach((element) => {
-          element(this.reason);
-        });
+        this.onRejectedCallbacks.forEach((fn) => fn());
       }
     };
 
     try {
       executor(this.resolve, this.reject);
-    } catch (e) {
-      this.reject(e);
+    } catch (error) {
+      this.reject(error);
     }
   }
 
   then(onFulfilled, onRejected) {
-    if (typeof onFulfilled !== "function") onFulfilled = (v) => v;
-    if (typeof onRejected !== "function")
-      onRejected = (e) => {
-        throw e;
-      };
+    onFulfilled =
+      typeof onFulfilled === "function" ? onFulfilled : (value) => value;
+    onRejected =
+      typeof onRejected === "function"
+        ? onRejected
+        : (error) => {
+            throw error;
+          };
 
     let promise2 = new MyPromise((resolve, reject) => {
+      const handleCallback = (callback, stateValue) => {
+        queueMicrotask(() => {
+          try {
+            const x = callback(stateValue);
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      };
       if (this.state === "pending") {
-        this.onFulfilledCallbacks.push(() => {
-          queueMicrotask(() => {
-            try {
-              let x = onFulfilled(this.value);
-              resolvePromise(promise2, x, resolve, reject);
-            } catch (e) {
-              reject(e);
-            }
-          });
-        });
-
-        this.onRejectedCallbacks.push(() => {
-          queueMicrotask(() => {
-            try {
-              let x = onRejected(this.reason);
-              resolvePromise(promise2, x, resolve, reject);
-            } catch (e) {
-              reject(e);
-            }
-          });
-        });
+        this.onFulfilledCallbacks.push(() =>
+          handleCallback(onFulfilled, this.value)
+        );
+        this.onRejectedCallbacks.push(() =>
+          handleCallback(onRejected, this.reason)
+        );
       }
-
       if (this.state === "fulfilled") {
-        queueMicrotask(() => {
-          try {
-            let x = onFulfilled(this.value);
-            resolvePromise(promise2, x, resolve, reject);
-          } catch (e) {
-            reject(e);
-          }
-        });
+        handleCallback(onFulfilled, this.value);
       }
-      if (this.state === "rejected") {
-        queueMicrotask(() => {
-          try {
-            let x = onRejected(this.reason);
-            resolvePromise(promise2, x, resolve, reject);
-          } catch (e) {
-            reject(e);
-          }
-        });
+      if (this.state === "reject") {
+        handleCallback(onRejected, this.reason);
       }
     });
+
     return promise2;
   }
 }
@@ -95,6 +74,7 @@ const resolvePromise = (promise2, x, resolve, reject) => {
       new TypeError("Chaining cycle detected for promise #<promise>")
     );
   }
+
   if ((typeof x === "object" && x !== null) || typeof x === "function") {
     let called = false;
     try {
@@ -105,7 +85,7 @@ const resolvePromise = (promise2, x, resolve, reject) => {
           (y) => {
             if (called) return;
             called = true;
-            return resolvePromise(promise2, y, resolve, reject);
+            resolvePromise(promise2, y, resolve, reject);
           },
           (r) => {
             if (called) return;
