@@ -7,6 +7,45 @@ class MyPromise {
     this.onRejectedCallbacks = [];
     this.resolve = (value) => {
       if (this.state === "pending") {
+        if (value === this) {
+          return this.reject(
+            new TypeError("Chaining cycle detected for promise #<promise>")
+          );
+        }
+
+        if (
+          (typeof value === "object" && value !== null) ||
+          typeof value === "function"
+        ) {
+          let then;
+          try {
+            then = value.then;
+          } catch (e) {
+            return this.reject(e);
+          }
+
+          if (typeof then === "function") {
+            let called = false;
+            try {
+              return then.call(
+                value,
+                (y) => {
+                  if (called) return;
+                  called = true;
+                  this.resolve(y);
+                },
+                (r) => {
+                  if (called) return;
+                  called = true;
+                  this.reject(r);
+                }
+              );
+            } catch (e) {
+              if (called) return;
+              return this.reject(e);
+            }
+          }
+        }
         this.state = "fulfilled";
         this.value = value;
         this.onFulfilledCallbacks.forEach((fn) => fn());
@@ -14,7 +53,7 @@ class MyPromise {
     };
     this.reject = (reason) => {
       if (this.state === "pending") {
-        this.state = "reject";
+        this.state = "rejected";
         this.reason = reason;
         this.onRejectedCallbacks.forEach((fn) => fn());
       }
@@ -59,7 +98,7 @@ class MyPromise {
       if (this.state === "fulfilled") {
         handleCallback(onFulfilled, this.value);
       }
-      if (this.state === "reject") {
+      if (this.state === "rejected") {
         handleCallback(onRejected, this.reason);
       }
     });
