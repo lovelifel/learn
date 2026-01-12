@@ -1,4 +1,9 @@
 class MyPromise {
+  static resolve(x) {
+    if (x instanceof MyPromise) return x;
+    return new MyPromise((resolve) => resolve(x));
+  }
+
   constructor(executor) {
     this.state = "pending";
     this.value = null;
@@ -104,6 +109,22 @@ class MyPromise {
     });
 
     return promise2;
+  }
+  catch(onRejected) {
+    return this.then(undefined, onRejected);
+  }
+
+  finally(callback) {
+    return this.then(
+      (value) => {
+        return MyPromise.resolve(callback()).then(() => value);
+      },
+      (reason) => {
+        return MyPromise.resolve(callback()).then(() => {
+          throw reason;
+        });
+      }
+    );
   }
 }
 
