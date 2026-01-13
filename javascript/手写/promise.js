@@ -40,6 +40,36 @@ class MyPromise {
     });
   }
 
+  static allSettled(iterable) {
+    return new MyPromise((resolve) => {
+      const arr = Array.from(iterable);
+      const n = arr.length;
+      let count = 0;
+      const results = [];
+      if (n === count) return resolve([]);
+      arr.forEach((item, index) => {
+        MyPromise.resolve(item).then(
+          (value) => {
+            results[index] = {
+              status: "fulfilled",
+              value,
+            };
+            count++;
+            if (count === n) return resolve(results);
+          },
+          (reason) => {
+            results[index] = {
+              status: "rejected",
+              reason,
+            };
+            count++;
+            if (count === n) return resolve(results);
+          }
+        );
+      });
+    });
+  }
+
   constructor(executor) {
     this.state = "pending";
     this.value = null;
@@ -203,6 +233,8 @@ const resolvePromise = (promise2, x, resolve, reject) => {
   }
 };
 
-MyPromise.race([1, new MyPromise((res) => setTimeout(() => res(2), 10))]).then(
-  console.log
-);
+MyPromise.allSettled([
+  MyPromise.resolve(1),
+  new MyPromise((_, rej) => rej("X")),
+  3,
+]).then(console.log);
