@@ -4,6 +4,11 @@ class MyPromise {
     return new MyPromise((resolve) => resolve(x));
   }
 
+  static reject(x) {
+    return new MyPromise((resolve, reject) => {
+      reject(x);
+    });
+  }
   static all(iterable) {
     return new MyPromise((resolve, reject) => {
       const arr = Array.from(iterable);
@@ -45,7 +50,7 @@ class MyPromise {
       const arr = Array.from(iterable);
       const n = arr.length;
       let count = 0;
-      const results = [];
+      const results = new Array(n);
       if (n === count) return resolve([]);
       arr.forEach((item, index) => {
         MyPromise.resolve(item).then(
@@ -64,6 +69,31 @@ class MyPromise {
             };
             count++;
             if (count === n) return resolve(results);
+          }
+        );
+      });
+    });
+  }
+
+  static any(iterable) {
+    return new MyPromise((resolve, reject) => {
+      const arr = Array.from(iterable);
+      const n = arr.length;
+      const errors = new Array(n);
+      let rejectedCount = 0;
+      let lock = false;
+      if (n === 0) return reject(new AggregateError([]));
+      arr.forEach((item, index) => {
+        MyPromise.resolve(item).then(
+          (value) => {
+            if (lock) return;
+            lock = true;
+            resolve(value);
+          },
+          (reason) => {
+            errors[index] = reason;
+            rejectedCount++;
+            if (rejectedCount === n) reject(new AggregateError(errors));
           }
         );
       });
@@ -232,9 +262,3 @@ const resolvePromise = (promise2, x, resolve, reject) => {
     resolve(x);
   }
 };
-
-MyPromise.allSettled([
-  MyPromise.resolve(1),
-  new MyPromise((_, rej) => rej("X")),
-  3,
-]).then(console.log);
