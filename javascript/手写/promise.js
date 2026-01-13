@@ -4,6 +4,42 @@ class MyPromise {
     return new MyPromise((resolve) => resolve(x));
   }
 
+  static all(iterable) {
+    return new MyPromise((resolve, reject) => {
+      const arr = Array.from(iterable);
+      const n = arr.length;
+      const results = new Array(n);
+      let count = 0;
+      if (n === 0) return resolve([]);
+      arr.forEach((item, index) => {
+        MyPromise.resolve(item).then(
+          (value) => {
+            results[index] = value;
+            count++;
+            if (count === n) resolve(results);
+          },
+          (reason) => {
+            reject(reason);
+          }
+        );
+      });
+    });
+  }
+  static race(iterable) {
+    return new MyPromise((resolve, reject) => {
+      for (const item of iterable) {
+        MyPromise.resolve(item).then(
+          (value) => {
+            resolve(value);
+          },
+          (reason) => {
+            reject(reason);
+          }
+        );
+      }
+    });
+  }
+
   constructor(executor) {
     this.state = "pending";
     this.value = null;
@@ -166,3 +202,7 @@ const resolvePromise = (promise2, x, resolve, reject) => {
     resolve(x);
   }
 };
+
+MyPromise.race([1, new MyPromise((res) => setTimeout(() => res(2), 10))]).then(
+  console.log
+);
